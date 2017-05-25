@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>IFAS FAWN Map APP</title>
+
+	<script src="script/jquery-1.8.1.min.js" type="text/javascript"></script>
+	
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="script/kendo.all.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="script/jquery.cookie.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+    <script src="./owl-carousel/owl.carousel.js"></script>
+    <script type="text/javascript" src="https://js.arcgis.com/3.17/"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+	<link rel="stylesheet" type="text/css" href="./CSS/style.css">
+    <link rel="stylesheet" type="text/css" href="./CSS/Stylesheet.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.17/esri/css/esri.css">
+
+	<style>
+
+	.footer{
+		z-index:3;
+		position:fixed;
+		left:0px;
+		bottom:0px;
+		background-color:#041b23;
+		width:100%;
+		height:90px;
+		background: #041b23; /* Old browsers */
+		background: -moz-linear-gradient(top, #041b23 0%, #093343 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#041b23), color-stop(100%,#093343)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top, #041b23 0%,#093343 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top, #041b23 0%,#093343 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top, #041b23 0%,#093343 100%); /* IE10+ */
+		background: linear-gradient(top, #041b23 0%,#093343 100%); /* W3C */
+			
+	}
+	.footer a {
+		color:white;	
+		cursor:pointer;
+		
+	}
+	#footerContain ul li a:hover {
+		color:#7b933e;
+		text-decoration:underline;
+	}
+	#footerContain ul{
+		margin-left: 50px;
+		display: block;
+		clear: both;
+		
+	}
+	#footerContain ul li{
+		display:inline;
+		padding: 2px 5px;
+	}	
+
+	#footerContain{
+		font-size:10px;
+		width:100%;
+		margin: 0 auto;
+		padding-top: 0px;
+		position: relative;
+		float:left;
+	}
+	a.ufSig{	
+		position: absolute;
+		right:50px;
+		top: 30px;
+		width: 195px;
+		height: 36px;
+		display: block;
+		background: transparent url(img/UF_Signature.png) 0 0 no-repeat;
+		text-indent: -9999em;
+	}
+		
+	#map_container {
+		z-index:1;
+	}
+	.topbar .img-left {
+		float:left;
+		max-width:250px;
+		position:fixed;
+		margin-top:10px;
+		margin-left:10px;
+	}
+	.topbar .img-right {
+		float:right;
+		margin-right:60px;
+		max-width:80px;
+	}
+	
+	.side_menu_tabcontent div {
+		height:40px;
+		padding-top:6px;
+		padding-left:5px;
+		color:white;
+		background-color:#333333;
+		border-radius:4px;
+		border-top:0.5px solid #A9A9A9;
+		border-bottom:0.5px solid #A9A9A9;
+	}
+	
+	input[type="button"]:hover {
+		cursor:pointer;
+	}
+
+	#waterMark {
+		background-repeat: no-repeat;
+		position: fixed;
+		bottom:90px;
+		z-index:3;
+	}
+	
+	#waterMark img {
+		opacity: 0.7; 
+		filter:alpha(opacity=50); 
+		max-width:450px;
+	}
+	#map_zoom_slider {
+		position: absolute;
+		margin-top:60px;
+		/*-webkit-transition: 0.5s;  For Safari 3.1 to 6.0 */
+		transition: 0.5s;
+	}
+
+	#Layer div {
+		padding-left: 30px;
+	}
+	#Station div {
+		padding-left:30px;
+	}
+	.search:hover {
+		background-color:#606060;
+		cursor:pointer;
+	}
+	.show{
+		width: 20%;
+		max-width: 350px;
+	}	
+	.search span {
+		padding-left:25px;
+	}
+	.searchArea {
+		display:none;
+	}
+	.searchArea select {
+		overflow:hidden;
+		height:30px;
+		font-size:13px;
+	}
+	
+	@media screen and (max-width: 1315px) {
+		.tabs ul li a {
+			font-size:13px;
+		}
+		.custom-control-description {
+			font-size:0.7rem;
+		}
+		#Layer div {
+			padding-left: 10px;
+		}		
+		#Station div {
+			padding-left:10px;
+		}		
+		.show{
+			width: 220px;
+		}			
+		.search span {
+			padding-left:10px;
+			font-size:0.8rem;
+		}		
+		.searchArea label {
+			font-size:0.8rem;
+		}
+		.searchArea select {
+			overflow:hidden;
+			height:28px;
+			font-size:11px;
+		}	
+		.searchArea input[type="button"] {
+			font-size:0.8rem;
+		}		
+		#waterMark img { 
+			max-width:300px;
+		}		
+
+	}
+
+	@media screen and (max-width:657px) {
+		.esriPopupWrapper .ui-resuzable{
+			height: 612px !important;
+			width: 612px !important;
+		}
+	}
+	
+		@media screen and (max-width:657px) {
+			#waterMark img { 
+				max-width:200px;
+			}	
+			#footerContain {
+				display:none;
+			}
+			a.ufSig {
+				 right:0px;
+				 margin:0 auto;
+				 position:relative;
+				 height:36px;
+				 top:-10px;
+			}
+			.topbar .img-left {
+				max-width:150px;
+				top:8px;
+			}
+			.topbar .img-right {
+				max-width:60px;
+				margin-top:5px;
+			}
+			.footer {
+				height:60px;
+			}
+			#waterMark {
+				bottom:60px;
+			}			
+		}
+	</style>
+<script>
+/*changed  .map_change in style.css
+  comment   right: 20%; width: 80%;*/
+</script>
+  </head>
+  <body>
+
+    <div id="map_wrapper">
+        <div data-role="header" class="topbar_back">
+
+	    <div class="topbar">
+			<div>
+				<img class="img-left" src="img/imgs/header/header left.png">
+			</div>
+			<div>
+				<img class="img-right" src ="img/imgs/header/header right.png">
+			</div>			
+	    </div>
+          <div class="menu">
+		  
+              <div class="menu_btn"  onclick="myFunction(this)">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+              </div>
+          </div>
+        </div>	
+
+  </div>
+
+      <div id="map_container">
+				  
+			  <div id="map" class="map" style="width:100%;"></div>
+		<div id="myDropdown" class="dropdown-content" style="background-color: #333333;" >
+        <div class="tabs" ng-app="myApp" ng-controller="myCtrl">
+            <ul>
+              <li>
+                  <a href="#" class="tablinks" onclick="openMenu(event, 'Station')">Station</a>         
+              </li>
+              <li>
+                <a href="#" class="tablinks" onclick="openMenu(event, 'Layer')">Layer</a>
+              </li>
+              <li>
+                <a href="#" class="tablinks" onclick="openMenu(event, 'Search')">Search</a>
+              </li>
+            </ul>
+
+      <!-- checkboxes on side_menu_col start-->
+		
+      <div id="Station" class="side_menu_tabcontent">
+
+	  
+	  
+        <div>
+			<label class="custom-control custom-checkbox">
+				<input type="checkbox" class="custom-control-input" name="openDropdownMenuFawn" id="openDropdownMenuFawn" unchecked>
+				<span class="custom-control-indicator"></span>
+				<span class="custom-control-description">FAWN</span>
+			</label>		
+		</div>
+
+		<div>
+			<label class="custom-control custom-checkbox">
+				<input type="checkbox" class="custom-control-input" id="openDropdownMenuFdacswx" unchecked>
+				<span class="custom-control-indicator"></span>
+				<span class="custom-control-description">Grower</span>
+			</label>		
+		</div>
+		
+
+
+      </div>
+
+      <div id="Layer" class="side_menu_tabcontent">
+
+        <!-- Temperature Layer checkbox begin -->
+		<div id="TemperatureLayerFdacswx" >
+			<label class="custom-control custom-checkbox">
+				<input type="checkbox" class="custom-control-input" id="tempLayer" unchecked>
+				<span class="custom-control-indicator"></span>
+				<span class="custom-control-description">Temperature (F)</span>
+			</label>			
+		</div>		
+
+
+		<div id = "WindSpeedLayerFdacswx" >
+			<label class="custom-control custom-checkbox">
+				<input type="checkbox" class="custom-control-input" id="windLayer" unchecked>
+				<span class="custom-control-indicator"></span>
+				<span class="custom-control-description">Wind Speed (mph)</span>
+			</label>		
+		</div>
+		
+		<div id = "RainfallLayerFdacswx">
+			<label class="custom-control custom-checkbox">
+				<input type="checkbox" class="custom-control-input" id="rainLayer" unchecked>
+				<span class="custom-control-indicator"></span>
+				<span class="custom-control-description">Rainfall (in)</span>
+			</label>		
+		</div>
+
+
+
+      </div>
+
+      <div id="Search" class="side_menu_tabcontent" >
+			<!--
+			<div>
+				<label class="custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" id="searchBarForFAWN">
+					<span class="custom-control-indicator"></span>
+					<span class="custom-control-description">Search for Grower and Station</span>
+				</label>		
+			</div>
+			-->
+			
+			<div class="search" id="fawnSearch">
+				<span>
+					Fawn
+				</span>
+			</div>
+<!--fawn search-->		
+            <div class="searchArea" id="searchForFawn" style="height:140px; padding-left:30px;">
+				<label>Station:</label><br>
+				<select class = "custom-select" ng-model="SelectedstationName2" ng-options="value for value in fawnStationName">
+				  <option value="">-- Station Name --</option>
+				</select>
+
+				<br/><br/>
+				<input type="button" class="btn btn-primary btn-sm" ng-click="submitFawn(SelectedstationName2)" name="submit" value="search"/>
+			</div> 
+			<!--
+			<div>
+				<label class="custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" id="searchBarForFadacs">
+					<span class="custom-control-indicator"></span>
+					<span class="custom-control-description">Search for Grower and Satation</span>
+				</label>		
+			</div>
+			-->
+			<div class="search" id = "fadacsSearch">
+				<span>
+					Grower
+				</span>
+			</div>			
+<!--fadacs search-->			
+			<div class="searchArea" id="searchForFadacs" style="height:220px; padding-left:20px;">
+				<label>Grower:</label><br>
+				<select class="custom-select" ng-model="selectedGrowerName" ng-options="y for y in growerNames" ng-change="onChanged(selectedGrowerName)" ng-model-options="{ updateOn: 'default blur', debounce: {'default': 500, 'blur': 0} }">
+				<option value="">-- Grower Name --</option>
+				</select>
+
+				<br><label for="station">Station:</label><br>
+				<select class="custom-select" name="station" ng-model="SelectedstationName1" ng-options="value for value in stationName"
+				style="">
+				<option value="">-- Station Name --</option>
+				</select>
+
+				<br/><br/>
+				<input type="button" class="btn btn-primary btn-sm" ng-click="submitFadacs(selectedGrowerName, SelectedstationName1)" name="submit" value="search"/>
+			</div>	
+      </div>
+
+      <div id="searchDropDown">
+        
+      </div>
+
+
+    </div>
+		  
+		  </div>
+      </div> 
+
+	
+  	<div id = "waterMark">
+		<img src="img/fdac_logo.png" alt=""/>
+	</div>
+		
+	<div class="footer">
+		<div id="footerContain">
+			<ul>
+				<li><a href="/contact.php">ContactFAWN</a></li>
+				<li><a href="/">Home</a></li>
+				<li><a href="/data/" >Database</a></li>
+				<li><a href="/climate.php">Climate</a></li>
+				<li><a href="/tools/">Tools</a></li>
+				<li><a href="/about_index.php">About</a></li>
+				<li><a href="/donate.php"><strong>Donate</strong></a></li>
+			</ul>
+			<ul>
+				<li><a href="">© University of Florida-Gainesville, Florida 32611; 352-392-0429</a></li>
+			</ul>
+			<ul>
+				<li><a href="">Disability Services</a></li>
+				<li><a href="">Privacy Policy</a></li>
+			</ul>
+
+			
+
+		</div>   
+		<a href="http://www.ufl.edu" class="ufSig">University of Florida</a>
+
+	</div>
+	  
+      <script type="text/javascript" src="./script/graph.js"></script>
+      <script type="text/javascript" src="./script/utility.js"></script>
+      <script type="text/javascript" src="./script/constant.js"></script>
+      <script type="text/javascript" src="./script/init.js"></script>
+      <script type="text/javascript" src="./script/angularSearch.js"></script>
+	
+	 
+
+
+      <script type="text/javascript">
+
+		
+        $(document).ready(function(){
+          coldp = function (grower, station){
+            var COLD_PROTECTION_URL = 'http://fawn.ifas.ufl.edu/tools/coldp/cold_protection_2015.php';
+            $.cookie('grower', grower,{expires : 7, path : "/"});
+            $.cookie('station', station, {expires : 7, path : "/"});
+            $.cookie('source', 'fdacs', {expires : 7, path : "/"});
+            console.log($.cookie('grower'));
+            console.log($.cookie('station'));
+            window.open("http://fawn.ifas.ufl.edu/tools/coldp/cold_protection_2015.php");
+          }
+		//function that uncheck checkbox every time refresh
+		$("#openDropdownMenuFdacswx").checked = false;
+		$("#openDropdownMenuFawn").checked = false;
+		$("#tempLayer").checked = false;
+		$("#windLayer").checked = false;
+		$("#rainLayer").checked = false;
+		
+		
+		//function that make sure station selected before layers
+		$("#tempLayer, #windLayer, #rainLayer").click(function(){
+			//console.log($("openDropdownMenuFawn").attr("checked") || $("#openDropdownMenuFdacswx").attr("checked"));
+			if (!($("#openDropdownMenuFawn").attr("checked") || $("#openDropdownMenuFdacswx").attr("checked"))) {
+				alert("Please select a station");
+				this.checked = false;
+			}
+		});
+			
+		//toggle search bar one click a time
+		$("#fawnSearch").on("click", function(){
+		
+			if ($("#searchForFadacs").css("display") === "block") {
+				$("#searchForFadacs").css("display", "none");
+			
+			}
+			if ($("#searchForFawn").css("display") === "none") {
+				
+				$("#searchForFawn").css("display", "block");
+			
+			} else {
+				$("#searchForFawn").css("display", "none");
+			
+			}
+			
+		});
+		
+		$("#fadacsSearch").on("click", function(){
+			if ($("#searchForFawn").css("display") === "block") {
+				$("#searchForFawn").css("display", "none");
+			
+			}
+			if ($("#searchForFadacs").css("display") === "none") {
+				$("#searchForFadacs").css("display", "block");
+			
+			} else {
+				$("#searchForFadacs").css("display", "none");
+		
+			}
+		});		
+		
+		  
+
+	});
+
+
+      </script>
+
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
